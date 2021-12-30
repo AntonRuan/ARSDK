@@ -30,12 +30,16 @@ public:
     zabbix_protocol();
     ~zabbix_protocol();
 
-    static std::vector<std::string> parser_packet(const std::string& data);
-    static std::string encode_packet(const std::string& data, const std::string& reserved);
+    int parser_packet(const std::string& data);
+    int parser_packet(const char* data, size_t len);
+    std::string encode_packet(const std::string& data, const std::string& reserved);
+    std::string encode_packet(const char* data, size_t len, const char* reserved, size_t res_len);
 
 protected:
+    virtual void on_packet(const std::string& data, const std::string& reserved) {}
 
 private:
+    std::string recv_body_str_;
 };
 
 #endif

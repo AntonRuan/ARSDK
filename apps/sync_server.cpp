@@ -10,20 +10,17 @@
 
 using namespace std;
 
-class sync_file_client : public lidig_tcp_client, public lidig_file
+class sync_file_client: public lidig_tcp_client, public lidig_file, public zabbix_protocol
 {
 public:
+    virtual void on_packet(const std::string& data, const std::string& reserved) override {
+        open(reserved, O_CREAT | O_TRUNC);
+        lidig_file::async_write(data.c_str(), data.size(), 0);
+    }
+
     using lidig_file::on_read;
     virtual void on_read(lidig_stream* stream, const char* data, ssize_t nread) override {
-        std::string str((const char*)data, nread);
-
-        vector<string> vec = zabbix_protocol::parser_packet(str);
-        if (vec.size() != 2) {
-            return;
-        }
-
-        open(vec[0], O_CREAT | O_TRUNC);
-        lidig_file::async_write(vec[1].c_str(), vec[1].size(), 0);
+        parser_packet(data, nread);
     }
 
     using lidig_tcp_client::on_write;
@@ -32,7 +29,7 @@ public:
     }
 };
 
-class sync_file_server : public lidig_tcp_server
+class sync_file_server: public lidig_tcp_server
 {
 public:
     sync_file_server() {}

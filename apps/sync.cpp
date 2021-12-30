@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class sync_file : public lidig_fs_event, public lidig_tcp_client, public lidig_file
+class sync_file : public lidig_fs_event, public lidig_tcp_client, public lidig_file, public zabbix_protocol
 {
 public:
     sync_file() {}
@@ -19,8 +19,8 @@ public:
         if (nread < 0)
             return;
 
-        string str(data, nread);
-        string send_data = zabbix_protocol::encode_packet(str, file->get_filename());
+        string filename = file->get_filename();
+        string send_data = encode_packet(data, nread, filename.c_str(), filename.size());
         lidig_tcp_client::async_write(send_data);
     }
 
@@ -30,6 +30,7 @@ public:
 
         if (events & UV_RENAME) {
             LogInfo() << "Change detected: " << "renamed " << filename;
+            readfile(filename);
         }
 
         if (events & UV_CHANGE) {
