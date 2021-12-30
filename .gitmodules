@@ -1,0 +1,6 @@
+[submodule "3rdpart/hiredis-vip"]
+	path = 3rdpart/hiredis-vip
+	url = https://github.com/vipshop/hiredis-vip.git
+[submodule "3rdpart/AMQP-CPP"]
+	path = 3rdpart/AMQP-CPP
+	url = https://github.com/CopernicaMarketingSoftware/AMQP-CPP.git

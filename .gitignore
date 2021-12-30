@@ -1,0 +1,12 @@
+*.o
+*.d
+*.so
+*.a
+*.exe
+*.png
+*.jpeg
+*.gif
+.DS_Store
+._.DS_Store
+main
+a.out
