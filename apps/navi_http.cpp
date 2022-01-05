@@ -8,14 +8,10 @@
 #include "network/lidig_http_server.h"
 #include "network/lidig_tcp_client.h"
 
+
 using namespace std;
 
 #define HOST_WWW_PATH "/mnt/sda/www"
-
-map<string, string> pictures_map_;
-
-lidig_http_session* session_;
-
 
 void response_200(lidig_http_session* self) {
     string html = "<html><body><h1>Hello, World!</h1></body></html>\n";
@@ -28,68 +24,25 @@ void response_404(lidig_http_session* self) {
     self->send_response("404", "Not Found");
 }
 
-void time_cb(lidig_timer* timer) {
-
-}
-
-class test_file : public lidig_file
-{
-public:
-    virtual void on_write(lidig_file* file, const char* data) {
-
-    }
-
-    virtual void on_close(lidig_file* file) {
-        delete file;
-    }
-
-    virtual void on_read(lidig_file* file, const char* data, ssize_t nread) override {
-        LogInfo() << nread;
-        if (nread < 0)
-            return;
-
-        string path = file->get_filename();
-        path = path.substr(path.rfind("/")+1);
-        LogDebug() << path;
-        pictures_map_[path] = string(data, nread);
-
-        if (session_ == nullptr)
-            return;
-
-        session_->add_body(pictures_map_[path]);
-        //session_->add_header("Content-Type", "image/jpeg");
-        session_->send_response("200", "OK");
-        //session_->close();
-    }
-};
-
-class test_http_server : public lidig_http_server
+class navi_http : public lidig_http_server, public lidig_file
 {
 public:
     virtual void on_packet(lidig_http_session* session,
-            std::map<std::string,std::string> map, const char* data, ssize_t nread) {
-        if (nread < 0)
-            return;
-
+            	std::map<std::string,std::string> map, const char* data, ssize_t nread) override {
         LogInfo() << session->get_remote_ip() <<  " " << session->get_remote_port() <<  " " << map["Path"];
         session_ = session;
-        //string str(data, nread);
-        //LogDebug() << nread << "\n" << str;
+
         if (map["Path"] == "/") {
-            test_file* file = new test_file();
             string filename = "/index.html";
-            int fd = file->readfile(HOST_WWW_PATH + filename);
+            int fd = readfile(HOST_WWW_PATH + filename);
             if (fd < 0) {
-                delete file;
                 response_404(session);
                 session->close();
                 return;
             }
         } else if (map["Path"] != "") {
-            test_file* file = new test_file();
-            int fd = file->readfile(HOST_WWW_PATH + map["Path"]);
+            int fd = readfile(HOST_WWW_PATH + map["Path"]);
             if (fd < 0) {
-                delete file;
                 response_404(session);
                 session->close();
                 return;
@@ -101,12 +54,22 @@ public:
         }
     }
 
-    virtual void on_close(lidig_http_session* session) {
-        if (session_ == session) {
-            session_ = nullptr;
-        }
+    using lidig_file::on_close;
+    using lidig_http_server::on_close;
+    using lidig_http_server::on_read;
+    virtual void on_read(lidig_file* file, const char* data, ssize_t nread) override {
+        LogInfo() << nread;
+        if (nread < 0 || session_ == nullptr)
+            return;
+
+        session_->add_body(data, nread);
+        session_->send_response("200", "OK");
     }
+
+private:
+	lidig_http_session* session_;
 };
+
 
 int main(int argc, char const *argv[]) {
     FNLog::LogPriority level = FNLog::PRIORITY_ERROR;
@@ -123,15 +86,12 @@ int main(int argc, char const *argv[]) {
     lidig_logger::get_instance().set_logger_sync();
     lidig_logger::get_instance().start();
 
-    lidig_loop* loop_ = new lidig_loop();
+    lidig_loop loop;
 
-    test_http_server* http_server = new test_http_server();
-    http_server->listen("0.0.0.0", 10080);
-
-    lidig_timer timer;
-    timer.timer_start(1000, 60000, time_cb);
+    navi_http http_server;
+    http_server.listen("0.0.0.0", 10080);
 
     LogInfo() << "start!";
 
-    return loop_->run();
+    return loop.run();
 }

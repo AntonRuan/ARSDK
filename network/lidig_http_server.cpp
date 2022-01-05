@@ -12,13 +12,16 @@ lidig_http_server::~lidig_http_server() {
 }
 
 void lidig_http_server::on_connection(lidig_tcp_server* self, int status) {
+    LogTrace() << status;
     lidig_http_session* session = new lidig_http_session();
     session->set_http_server(this);
 
     if (accept(session) == 0)
         session->async_read_start();
-    else
+    else {
+        LogError() << "accept failed!";
         delete session;
+    }
 }
 
 void lidig_http_server::on_close_session(lidig_http_session* session) {
