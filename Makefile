@@ -81,7 +81,7 @@ endif
 
 # 依赖相关
 .PHONY: all clean distclean tests
-all: libld_sdk.so libldsdk.a
+all: libarsdk.so libarsdk.a
 
 %.d: %.cpp
 	@rm -f $@; \
@@ -93,10 +93,10 @@ all: libld_sdk.so libldsdk.a
 %.o: %.cpp
 	$(CPP) $< $(CPPFLAGS) -fPIC -c -o $@
 
-libld_sdk.so: $(sources:.cpp=.o)
+libarsdk.so: $(sources:.cpp=.o)
 	$(CPP) $^ $(LDFLAGS) -shared -o $@
 
-libldsdk.a: $(sources:.cpp=.o)
+libarsdk.a: $(sources:.cpp=.o)
 	$(AR) crs $@ $^
 	@chmod a+x $@
 
@@ -111,10 +111,10 @@ tests:
 	$(MAKE) -C tests
 
 clean:
-	@-rm -rf $(sources:.cpp=.o) $(sources:.cpp=.d) libld_sdk.so libldsdk.a
+	@-rm -rf $(sources:.cpp=.o) $(sources:.cpp=.d) libarsdk.so libarsdk.a
 
 distclean:
 	$(MAKE) -C 3rdpart/hiredis-vip clean
 	$(MAKE) -C 3rdpart/AMQP-CPP clean
 	$(MAKE) -C tests clean
-	@-rm -rf $(sources:.cpp=.o) $(sources:.cpp=.d) libld_sdk.so libldsdk.a
+	@-rm -rf $(sources:.cpp=.o) $(sources:.cpp=.d) libarsdk.so libarsdk.a

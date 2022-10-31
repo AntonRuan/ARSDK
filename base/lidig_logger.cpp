@@ -49,7 +49,7 @@ void lidig_logger::add_logger_to_file(const std::string& fpath, const std::strin
 
     FNLog::Channel& channel = logger.shm_->channels_[0];
     FNLog::Device& device = channel.devices_[channel.device_size_++];
-    memset(&device, 0, sizeof(device));
+    memset((void*)&device, 0, sizeof(device));
     device.device_id_ = device_id_++;
 
     device.out_type_ = FNLog::DEVICE_OUT_FILE;
@@ -78,7 +78,7 @@ void lidig_logger::add_logger_to_screen(FNLog::LogPriority level) {
 
     FNLog::Channel& channel = logger.shm_->channels_[0];
     FNLog::Device& device = channel.devices_[channel.device_size_++];
-    memset(&device, 0, sizeof(device));
+    memset((void*)&device, 0, sizeof(device));
     device.device_id_ = device_id_++;
 
     device.out_type_ = FNLog::DEVICE_OUT_SCREEN;
@@ -102,7 +102,7 @@ void lidig_logger::add_logger_to_udp(const std::string& ip, int port, FNLog::Log
 
     FNLog::Channel& channel = logger.shm_->channels_[0];
     FNLog::Device& device = channel.devices_[channel.device_size_++];
-    memset(&device, 0, sizeof(device));
+    memset((void*)&device, 0, sizeof(device));
     device.device_id_ = device_id_++;
 
     device.out_type_ = FNLog::DEVICE_OUT_UDP;
@@ -131,10 +131,10 @@ int lidig_logger::logger_init() {
     logger.yaml_path_ = "";
     logger.hot_update_ = false;
     logger.shm_->channel_size_ = 1;
-    memset(&logger.shm_->channels_, 0, sizeof(logger.shm_->channels_));
+    memset((void*)&logger.shm_->channels_, 0, sizeof(logger.shm_->channels_));
 
     FNLog::Channel& channel = logger.shm_->channels_[0];
-    memset(&channel, 0, sizeof(channel));
+    memset((void*)&channel, 0, sizeof(channel));
     channel.channel_id_ = 0;
     channel.channel_type_ = FNLog::CHANNEL_ASYNC;
     channel.config_fields_[FNLog::CHANNEL_CFG_PRIORITY] = FNLog::PRIORITY_TRACE;

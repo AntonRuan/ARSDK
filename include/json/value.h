@@ -50,10 +50,11 @@
 // be used by...
 #if defined(JSONCPP_DISABLE_DLL_INTERFACE_WARNING)
 #pragma warning(push)
-#pragma warning(disable : 4251)
+#pragma warning(disable : 4251 4275)
 #endif // if defined(JSONCPP_DISABLE_DLL_INTERFACE_WARNING)
 
-#pragma pack(push, 8)
+#pragma pack(push)
+#pragma pack()
 
 /** \brief JSON (JavaScript Object Notation).
  */
@@ -263,10 +264,10 @@ private:
     CZString(ArrayIndex index);
     CZString(char const* str, unsigned length, DuplicationPolicy allocate);
     CZString(CZString const& other);
-    CZString(CZString&& other);
+    CZString(CZString&& other) noexcept;
     ~CZString();
     CZString& operator=(const CZString& other);
-    CZString& operator=(CZString&& other);
+    CZString& operator=(CZString&& other) noexcept;
 
     bool operator<(CZString const& other) const;
     bool operator==(CZString const& other) const;
@@ -344,13 +345,13 @@ public:
   Value(bool value);
   Value(std::nullptr_t ptr) = delete;
   Value(const Value& other);
-  Value(Value&& other);
+  Value(Value&& other) noexcept;
   ~Value();
 
   /// \note Overwrite existing comments. To preserve comments, use
   /// #swapPayload().
   Value& operator=(const Value& other);
-  Value& operator=(Value&& other);
+  Value& operator=(Value&& other) noexcept;
 
   /// Swap everything.
   void swap(Value& other);
@@ -436,7 +437,7 @@ public:
   /// \post type() is arrayValue
   void resize(ArrayIndex newSize);
 
-  //@{
+  ///@{
   /// Access an array element (zero based index). If the array contains less
   /// than index element, then null value are inserted in the array so that
   /// its size is index+1.
@@ -444,15 +445,15 @@ public:
   /// this from the operator[] which takes a string.)
   Value& operator[](ArrayIndex index);
   Value& operator[](int index);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /// Access an array element (zero based index).
   /// (You may need to say 'value[0u]' to get your compiler to distinguish
   /// this from the operator[] which takes a string.)
   const Value& operator[](ArrayIndex index) const;
   const Value& operator[](int index) const;
-  //@}
+  ///@}
 
   /// If the array contains at least index+1 elements, returns the element
   /// value, otherwise returns defaultValue.
@@ -635,9 +636,9 @@ private:
   public:
     Comments() = default;
     Comments(const Comments& that);
-    Comments(Comments&& that);
+    Comments(Comments&& that) noexcept;
     Comments& operator=(const Comments& that);
-    Comments& operator=(Comments&& that);
+    Comments& operator=(Comments&& that) noexcept;
     bool has(CommentPlacement slot) const;
     String get(CommentPlacement slot) const;
     void set(CommentPlacement slot, String comment);
@@ -918,8 +919,8 @@ public:
    *  because the returned references/pointers can be used
    *  to change state of the base class.
    */
-  reference operator*() { return deref(); }
-  pointer operator->() { return &deref(); }
+  reference operator*() const { return const_cast<reference>(deref()); }
+  pointer operator->() const { return const_cast<pointer>(&deref()); }
 };
 
 inline void swap(Value& a, Value& b) { a.swap(b); }

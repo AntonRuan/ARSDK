@@ -1,0 +1,16 @@
+body {padding-top: 80px;color:#333;background-color:#e7e7eb;}
+pre {border:0px;word-break:break-all;word-wrap:break-word;white-space: pre-wrap;}
+h2 { font-size: 1.5em; font-weight: bold;}
+.position { border:1px solid #ccc;background-color:white; padding:10px 5px; }
+.content { border:1px solid #ccc;background-color:white; padding:10px 5px; margin:10px 0; }
+#footer {margin-top:50px;margin-bottom: 50px;}
+.info {padding:0 8px;}
+.info p{text-indent: 2em;}
+.info h3{font-size: 1.5em;}
+.tips { margin:10px 0;}
+.tips .alert{margin-bottom:0px;}
+.nav-tabs { margin-bottom: 10px;}
+
+@media screen and (max-width: 480px) {
+    .bdsharebuttonbox { display:none; }
+}

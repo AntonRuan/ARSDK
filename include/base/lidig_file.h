@@ -15,7 +15,7 @@ class lidig_file
 {
 public:
     lidig_file();
-    ~lidig_file();
+    virtual ~lidig_file();
 
     int open(const std::string& file, int flags = 0);
     int async_read(int64_t bytes, int64_t offset);

@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<title>世界上最好的美食</title>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="/bootstrap.css" rel="stylesheet">
+<link href="/tool.css" rel="stylesheet">
+<script type="text/javascript" src="/jquery.js"></script>
+<script type="text/javascript" src="/bootstrap.min.js"></script>
+<style>
+#item { font-size:40px; font-weight:bold; margin:50px 0;}
+#cj_title { font-size:18px; margin:25px 0; }
+</style>
+</head>
+<body style="padding-top:0;">
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-12 content text-center">
+			<form class="form-inline" method="get">
+				<div id="cj_title">点击开始</div>
+				<div>
+					<button type="button" class="btn btn-primary" id="start">开始</button>
+					<button type="button" class="btn btn-primary" id="stop">停止</button>
+				</div>
+				<div id="item">点击开始抽奖</div>
+				<div id="custom" style="margin-top:20px;">
+					<a href="javascript:;" class="save_item">[自定义候选项]</a>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">自定义候选项</h4>
+      </div>
+      <div class="modal-body">
+	  	<div class="form-group">
+			<label>标题：</label>
+			<input type="text" class="form-control" id="title" value="今晚宠幸的美食" />
+		</div>
+		<div class="form-group">
+			<label>候选项：（一行一个）</label>
+			<textarea class="form-control" id="candidate" rows="10">鸡胸肉
+牛肉
+小炒肉
+沙拉
+回锅肉
+火锅
+蛋蛋
+曾曾</textarea>
+		</div>
+      </div>
+      <div class="modal-footer">
+	    <button type="button" class="btn btn-primary" id="save">确定</button>
+		<button type="button" class="btn" id="clear">清空</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var timer;
+var arrCandidate = new Array();
+var arrshucai = new Array();
+var arrrourou = new Array();
+
+$(document).ready(function(){
+	candidate = $('#candidate').val();
+	$('#cj_title').text( $('#title').val() );
+	arr = candidate.split("\n");
+	for (var i=0; i<arr.length; i++) {
+		if( $.trim(arr[i]) != ''){
+			arrCandidate.push( arr[i] );
+		}
+	}
+	arrshucai.push("包菜");
+	arrshucai.push("香菜");
+	arrshucai.push("大白菜");
+	arrshucai.push("萝卜");
+	arrshucai.push("胡萝卜");
+	arrshucai.push("山药");
+	arrshucai.push("芋头");
+	arrshucai.push("马铃薯");
+	arrshucai.push("小白菜");
+	arrshucai.push("青江菜");
+	arrshucai.push("花椰菜");
+	arrshucai.push("丝瓜");
+	arrshucai.push("南瓜");
+	arrshucai.push("番茄");
+	arrshucai.push("玉米");
+	arrshucai.push("毛豆");
+	arrshucai.push("豌豆");
+	arrshucai.push("绿豆芽");
+	arrshucai.push("黄豆芽");
+
+	arrrourou.push("鸡肉");
+	arrrourou.push("猪肉");
+	arrrourou.push("牛肉");
+	arrrourou.push("马肉");
+	arrrourou.push("牛肉");
+	arrrourou.push("猪肉");
+	arrrourou.push("曾曾");
+	arrrourou.push("牛肉");
+	arrrourou.push("蛋蛋");
+	arrrourou.push("鹿肉");
+	arrrourou.push("鹅肉");
+	arrrourou.push("鸡肉");
+	arrrourou.push("牛肉");
+	arrrourou.push("兔肉");
+	arrrourou.push("羊肉");
+	arrrourou.push("火鸡");
+
+	$('#start').show();
+	$('#stop').hide();
+
+    $('.save_item').click(function(){
+        $('#myModal').modal();
+	});
+
+	$('#clear').click(function(){
+		$('#candidate').val('');
+	});
+
+	$('#save').click(function(){
+		var candidate = $('#candidate').val();
+		if( candidate == '' ){
+			alert('请输入候选项');
+			return false;
+		}
+		arrCandidate = new Array();
+		var arr = candidate.split("\n");
+		for (var i=0; i<arr.length; i++) {
+			if( $.trim(arr[i]) != ''){
+				arrCandidate.push( arr[i] );
+			}
+		}
+		if( arrCandidate.length == 1 ){
+			alert('真的就一个候选项？');
+			return false;
+		}
+		$('#cj_title').text( $('#title').val() );
+		$('#item').text( '点击开始抽奖' );
+		$('#myModal').modal('hide');
+	});
+
+
+	$('#start').click(function(){
+		if( arrCandidate.length == 0 ){
+			alert('请输入候选项');
+			return false;
+		}
+
+		clearInterval(timer);
+		timer = setInterval( function(){
+			index = parseInt(Math.random()*(arrrourou.length));
+			index1 = parseInt(Math.random()*(arrshucai.length));
+			$('#item').text(arrrourou[index] + " + " + arrshucai[index1]);
+		},50);
+		$('#start').hide();
+		$('#stop').show();
+		$('#custom').hide();
+		return false;
+	});
+
+	$('#stop').click(function(){
+		clearInterval(timer);
+		$('#stop').hide();
+		$('#start').show();
+		$('#custom').show();
+		return false;
+	});
+});
+</script>
+</body>
+</html>

@@ -8,10 +8,9 @@
 #include "network/lidig_http_server.h"
 #include "network/lidig_tcp_client.h"
 
-
 using namespace std;
 
-#define HOST_WWW_PATH "/mnt/sda/www"
+#define HOST_WWW_PATH "./static"
 
 void response_200(lidig_http_session* self) {
     string html = "<html><body><h1>Hello, World!</h1></body></html>\n";
@@ -24,50 +23,52 @@ void response_404(lidig_http_session* self) {
     self->send_response("404", "Not Found");
 }
 
-class navi_http : public lidig_http_server, public lidig_file
+class test_file : public lidig_file
+{
+public:
+    virtual void on_write(lidig_file* file, const char* data) {
+
+    }
+
+    virtual void on_close(lidig_file* file) {
+        delete file;
+    }
+
+    virtual void on_read(lidig_file* file, const char* data, ssize_t nread) override {
+        LogInfo() << nread;
+        if (nread < 0)
+            return;
+
+        lidig_http_session* session = (lidig_http_session*) file->user_data;
+        session->add_body(data, nread);
+        session->send_response("200", "OK");
+    }
+};
+
+class navi_http : public lidig_http_server
 {
 public:
     virtual void on_packet(lidig_http_session* session,
-            	std::map<std::string,std::string> map, const char* data, ssize_t nread) override {
+                std::map<std::string,std::string> map, const char* data, ssize_t nread) override {
         LogInfo() << session->get_remote_ip() <<  " " << session->get_remote_port() <<  " " << map["Path"];
-        session_ = session;
 
-        if (map["Path"] == "/") {
-            string filename = "/index.html";
-            int fd = readfile(HOST_WWW_PATH + filename);
+        if (map["Path"] != "") {
+            string filename = string(HOST_WWW_PATH) + "/index.html";
+            if (map["Path"] != "/")
+                filename = HOST_WWW_PATH + map["Path"];
+            test_file* file = new test_file();
+            file->user_data = session;
+            int fd = file->readfile(filename);
             if (fd < 0) {
+                delete file;
                 response_404(session);
-                session->close();
-                return;
-            }
-        } else if (map["Path"] != "") {
-            int fd = readfile(HOST_WWW_PATH + map["Path"]);
-            if (fd < 0) {
-                response_404(session);
-                session->close();
-                return;
             }
         } else {
             response_200(session);
             session->close();
-            return;
         }
+
     }
-
-    using lidig_file::on_close;
-    using lidig_http_server::on_close;
-    using lidig_http_server::on_read;
-    virtual void on_read(lidig_file* file, const char* data, ssize_t nread) override {
-        LogInfo() << nread;
-        if (nread < 0 || session_ == nullptr)
-            return;
-
-        session_->add_body(data, nread);
-        session_->send_response("200", "OK");
-    }
-
-private:
-	lidig_http_session* session_;
 };
 
 
@@ -89,7 +90,7 @@ int main(int argc, char const *argv[]) {
     lidig_loop loop;
 
     navi_http http_server;
-    http_server.listen("0.0.0.0", 10080);
+    http_server.listen("0.0.0.0", 10083);
 
     LogInfo() << "start!";
 

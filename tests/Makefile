@@ -13,7 +13,7 @@ CC := $(CROSS_COMPILE)gcc
 # Flags
 CPPFLAGS += -I../include -I$(SYSROOT)/include
 LDFLAGS += -L$(SYSROOT)/lib -L..
-LDFLAGS += -lldsdk -luv -lpthread
+LDFLAGS += -l:libarsdk.a -luv -lpthread
 CPPFLAGS += -O0 -g -Wall -std=c++11
 
 
