@@ -66,13 +66,15 @@ void lidig_health::send_alert(const std::string& name,
 health_server::health_server(uint64_t timeout, uint64_t repeat) {
     LogTrace();
 
-    timer_ = new lidig_timer();
-    timer_->timer_start(timeout, repeat, std::bind(&health_server::run, this));
+    timer_start(timeout, repeat);
 }
 
 health_server::~health_server() {
-    if (timer_) delete timer_;
     LogTrace();
+}
+
+void health_server::on_time(lidig_timer* timer) {
+    run();
 }
 
 void health_server::run(void) {

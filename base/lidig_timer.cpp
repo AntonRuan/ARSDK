@@ -12,17 +12,15 @@ lidig_timer::~lidig_timer() {
     LogTrace();
 }
 
-void time_cb(uv_timer_t *handle) {
+void lidig_timer::time_cb(uv_timer_t *handle) {
     lidig_timer* self = (lidig_timer*) handle->data;
-    if (self->timer_cb_)
-        self->timer_cb_(self);
+    self->on_time(self);
 }
 
-void lidig_timer::timer_start(uint64_t timeout, uint64_t repeat, timer_callback cb) {
+void lidig_timer::timer_start(uint64_t timeout, uint64_t repeat) {
     uv_timer_init(lidig_loop::get_loop(), timer_);
     timer_->data = this;
     uv_timer_start(timer_, time_cb, timeout, repeat);
-    timer_cb_ = cb;
 }
 
 void lidig_timer::start() {

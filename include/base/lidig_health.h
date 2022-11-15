@@ -44,7 +44,7 @@ private:
 };
 
 typedef std::function<void(std::string,std::string,std::string)> send_alert_callback;
-class health_server
+class health_server: public lidig_timer
 {
 public:
     health_server(uint64_t timeout = 0, uint64_t repeat = 5000);
@@ -57,8 +57,9 @@ public:
     void set_send_alert_cb(send_alert_callback cb) {send_alert_cb_ = cb;};
     send_alert_callback send_alert_cb_ = nullptr;
 
+    virtual void on_time(lidig_timer* timer) override;
+
 private:
-    lidig_timer* timer_;
     std::vector<lidig_health*> obj_;
 };
 

@@ -13,20 +13,22 @@
 class lidig_timer
 {
 public:
-    typedef std::function<void(lidig_timer*)> timer_callback;
-
     lidig_timer();
     ~lidig_timer();
 
-    void timer_start(uint64_t timeout, uint64_t repeat, timer_callback cb);
+    void timer_start(uint64_t timeout, uint64_t repeat);
     void start();
     void stop();
 
     void* user_data;
-    timer_callback timer_cb_ = nullptr;
+
+protected:
+    virtual void on_time(lidig_timer* timer) {}
 
 private:
     uv_timer_t* timer_;
+
+    static void time_cb(uv_timer_t *handle);
 };
 
 #endif
