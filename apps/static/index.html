@@ -36,134 +36,140 @@
 </div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">自定义候选项</h4>
-      </div>
-      <div class="modal-body">
-	  	<div class="form-group">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">自定义候选项</h4>
+			</div>
+			<div class="modal-body">
+			<div class="form-group">
 			<label>标题：</label>
 			<input type="text" class="form-control" id="title" value="今晚宠幸的美食" />
 		</div>
 		<div class="form-group">
 			<label>候选项：（一行一个）</label>
-			<textarea class="form-control" id="candidate" rows="10">鸡胸肉
-牛肉
-小炒肉
-沙拉
-回锅肉
-火锅
-蛋蛋
-曾曾</textarea>
+			<textarea class="form-control" id="rou" rows="10"></textarea>
+			<textarea class="form-control" id="shucai" rows="10"></textarea>
 		</div>
-      </div>
-      <div class="modal-footer">
-	    <button type="button" class="btn btn-primary" id="save">确定</button>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-primary" id="save">确定</button>
 		<button type="button" class="btn" id="clear">清空</button>
-      </div>
-    </div>
-  </div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script>
 var timer;
-var arrCandidate = new Array();
-var arrshucai = new Array();
-var arrrourou = new Array();
+var arrVegetables = new Array();
+var arrMeat = new Array();
+
+function getDict(){
+    $.ajax({
+        type: "POST",
+        url:'/dictList',
+        data:{},
+        async: false,
+        success: function(data) {
+						const obj = JSON.parse(data);
+						arrMeat = obj.meat;
+						arrVegetables = obj.vegetables;
+						console.log(obj.meat);
+						console.log(obj.vegetables);
+        }
+    });
+}
 
 $(document).ready(function(){
-	candidate = $('#candidate').val();
-	$('#cj_title').text( $('#title').val() );
-	arr = candidate.split("\n");
-	for (var i=0; i<arr.length; i++) {
-		if( $.trim(arr[i]) != ''){
-			arrCandidate.push( arr[i] );
-		}
-	}
-	arrshucai.push("包菜");
-	arrshucai.push("香菜");
-	arrshucai.push("大白菜");
-	arrshucai.push("萝卜");
-	arrshucai.push("胡萝卜");
-	arrshucai.push("山药");
-	arrshucai.push("芋头");
-	arrshucai.push("马铃薯");
-	arrshucai.push("小白菜");
-	arrshucai.push("青江菜");
-	arrshucai.push("花椰菜");
-	arrshucai.push("丝瓜");
-	arrshucai.push("南瓜");
-	arrshucai.push("番茄");
-	arrshucai.push("玉米");
-	arrshucai.push("毛豆");
-	arrshucai.push("豌豆");
-	arrshucai.push("绿豆芽");
-	arrshucai.push("黄豆芽");
 
-	arrrourou.push("鸡肉");
-	arrrourou.push("猪肉");
-	arrrourou.push("牛肉");
-	arrrourou.push("马肉");
-	arrrourou.push("牛肉");
-	arrrourou.push("猪肉");
-	arrrourou.push("曾曾");
-	arrrourou.push("牛肉");
-	arrrourou.push("蛋蛋");
-	arrrourou.push("鹿肉");
-	arrrourou.push("鹅肉");
-	arrrourou.push("鸡肉");
-	arrrourou.push("牛肉");
-	arrrourou.push("兔肉");
-	arrrourou.push("羊肉");
-	arrrourou.push("火鸡");
+	$('#cj_title').text( $('#title').val() );
+	getDict();
+	var str = "";
+	for (const key in arrMeat) {
+	  str += arrMeat[key] + '\n';
+	  console.log(key);
+	}
+	$('#rou').val(str);
+
+	str = "";
+	for (const key in arrVegetables) {
+	  str += arrVegetables[key] + '\n';
+	  console.log(key);
+	}
+	$('#shucai').val(str);
 
 	$('#start').show();
 	$('#stop').hide();
 
-    $('.save_item').click(function(){
-        $('#myModal').modal();
+	$('.save_item').click(
+			function(){
+				$('#myModal').modal();
 	});
 
-	$('#clear').click(function(){
-		$('#candidate').val('');
+	$('#clear').click(
+		function(){
+			$('#rou').val('');
+			$('#shucai').val('');
 	});
 
 	$('#save').click(function(){
-		var candidate = $('#candidate').val();
-		if( candidate == '' ){
+		var rou = $('#rou').val();
+		if( rou == '' ){
 			alert('请输入候选项');
 			return false;
 		}
-		arrCandidate = new Array();
-		var arr = candidate.split("\n");
+
+		var urlEncodedData = "{\"meat\":[";
+
+		var arr = rou.split("\n");
 		for (var i=0; i<arr.length; i++) {
 			if( $.trim(arr[i]) != ''){
-				arrCandidate.push( arr[i] );
+				arrMeat.push( arr[i] );
+				urlEncodedData += "\"" + arr[i] + "\",";
 			}
 		}
-		if( arrCandidate.length == 1 ){
-			alert('真的就一个候选项？');
+		urlEncodedData += "],\"vegetables\":[";
+
+		var shucai = $('#shucai').val();
+		if( shucai == '' ){
+			alert('请输入候选项');
 			return false;
 		}
+		var arr = shucai.split("\n");
+		for (var i=0; i<arr.length; i++) {
+			if( $.trim(arr[i]) != ''){
+				arrVegetables.push( arr[i] );
+				urlEncodedData += "\"" + arr[i] + "\",";
+			}
+		}
+		urlEncodedData += "]}";
+
 		$('#cj_title').text( $('#title').val() );
 		$('#item').text( '点击开始抽奖' );
 		$('#myModal').modal('hide');
+
+		var XHR = new XMLHttpRequest();
+
+		XHR.addEventListener('error', function(event) {
+			alert('哎呀！出问题了。');
+		});
+
+		XHR.open('POST', 'http://zhang.codec.wang:10083/post');
+
+		XHR.send(urlEncodedData);
+
 	});
 
 
 	$('#start').click(function(){
-		if( arrCandidate.length == 0 ){
-			alert('请输入候选项');
-			return false;
-		}
 
 		clearInterval(timer);
 		timer = setInterval( function(){
-			index = parseInt(Math.random()*(arrrourou.length));
-			index1 = parseInt(Math.random()*(arrshucai.length));
-			$('#item').text(arrrourou[index] + " + " + arrshucai[index1]);
+			index = parseInt(Math.random()*(arrMeat.length));
+			index1 = parseInt(Math.random()*(arrVegetables.length));
+			$('#item').text(arrMeat[index] + " + " + arrVegetables[index1]);
 		},50);
 		$('#start').hide();
 		$('#stop').show();

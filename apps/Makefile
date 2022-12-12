@@ -3,7 +3,7 @@
 #
 all:
 
-SYSROOT := /opt/homebrew/Cellar/libuv/1.42.0
+#SYSROOT := /opt/homebrew/Cellar/libuv/1.42.0
 
 # 交叉编译工具链
 AR := $(CROSS_COMPILE)ar
@@ -12,8 +12,8 @@ CC := $(CROSS_COMPILE)gcc
 
 # Flags
 CPPFLAGS += -I../include -I$(SYSROOT)/include
-LDFLAGS += -L$(SYSROOT)/lib -L..
-LDFLAGS += -l:libarsdk.a -luv -lpthread
+LDFLAGS += -L$(SYSROOT)/lib -L.. -l:libarsdk.a
+LDFLAGS += -luv -lpthread -lmosquittopp
 CPPFLAGS += -O0 -g -Wall -std=c++11
 
 

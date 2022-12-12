@@ -6,7 +6,7 @@ all:
 #export LIDIG_ARCH := "openwrt_mips"
 #export LIDIG_AMQP := 1
 #export LIDIG_UCI := 1
-#export LIDIG_MQTT := 1
+export LIDIG_MQTT := 1
 #export LIDIG_MODBUS := 1
 #export LIDIG_SQLITE3 := 1
 
@@ -16,8 +16,10 @@ ifeq ($(strip $(LIDIG_ARCH)), "openwrt_mips")
 export SYSROOT := /home/xiaomi/host_uclibc/openwrt-sdk-mt7621/staging_dir/toolchain-mipsel_24kc_gcc-7.4.0_musl
 export CROSS_COMPILE := $(SYSROOT)/bin/mipsel-openwrt-linux-
 export STAGING_DIR := /home/xiaomi/host_uclibc/openwrt-sdk-mt7621/staging_dir
-else
+else ifeq ($(strip $(LIDIG_ARCH)), "macos")
 export SYSROOT := /opt/homebrew/Cellar/libuv/1.42.0
+else
+export SYSROOT :=
 endif
 
 

@@ -16,12 +16,16 @@ public:
     lidig_udp();
     ~lidig_udp();
 
-    int bind(const std::string& ip, int port);
+    int bind(const std::string& ip, const int port);
+    int set_broadcast();
 
-    int async_write(const std::string& ip, int port, const char* data, size_t size);
-    int async_write(const struct sockaddr *addr, const char* data, size_t size);
+    int async_write(const std::string& ip, const int port, const std::string& data);
+    int async_write(const std::string& ip, const int port, const char* data, const size_t size);
+    int async_write(const struct sockaddr *addr, const char* data, const size_t size);
     int async_read_start();
     void close();
+
+    std::string get_local_ip(void);
 
     void* user_data;
 

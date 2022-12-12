@@ -53,16 +53,16 @@ int lidig_file::async_write(const char* data, size_t size, int64_t offset) {
 
 int lidig_file::open(const std::string& file, int flags) {
     file_name_ = file;
-    fd_ = uv_fs_open(lidig_loop::get_loop(), handle_, file.c_str(), O_RDWR | flags, 0644, nullptr);
+    fd_ = uv_fs_open(lidig_loop::get_loop(), handle_, file.c_str(), O_RDONLY | flags, 0644, nullptr);
     if (fd_ < 0)
         LogError() << file << " failed!";
     else
-        LogInfo() << file;
+        LogDebug() << file;
     return fd_;
 }
 
 int lidig_file::readfile(const std::string& file) {
-    int ret = open(file, 0);
+    int ret = open(file, O_RDONLY);
     if (ret < 0)
         return ret;
 
@@ -129,7 +129,7 @@ void lidig_file::close() {
         self->on_close(self);
     };
 
-    LogInfo() << file_name_;
+    LogDebug() << file_name_;
     uv_fs_close(lidig_loop::get_loop(), handle_, fd_,
         [](uv_fs_t* req) {
             on_close(req);

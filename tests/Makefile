@@ -3,7 +3,9 @@
 #
 all:
 
+ifeq ($(strip $(LIDIG_ARCH)), "macso")
 export SYSROOT := /opt/homebrew/Cellar/libuv/1.42.0
+endif
 
 # 交叉编译工具链
 AR := $(CROSS_COMPILE)ar
