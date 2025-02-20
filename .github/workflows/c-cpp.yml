@@ -13,5 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: req
+      run: apt install libuv1-dev libmosquittopp-dev libmodbus-dev libsqlite3-dev
     - name: make
       run: make
